@@ -1,0 +1,59 @@
+---
+import { db } from '../firebaseConfig.js';
+import { collection, addDoc } from 'firebase/firestore';
+---
+
+<form id="productForm">
+  <label>
+    Nombre:
+    <input type="text" id="nombre" name="nombre" required />
+  </label>
+  <label>
+    Descripción:
+    <textarea id="descripcion" name="descripcion" required></textarea>
+  </label>
+  <label>
+    Precio:
+    <input type="number" id="precio" name="precio" required />
+  </label>
+  <label>
+    Imagen:
+    <input type="text" id="imagen" name="imagen" required />
+  </label>
+  <button type="submit">Subir Producto</button>
+</form>
+
+<script>
+  // Agregar producto a Firestore
+  const form = document.getElementById('productForm');
+  
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    // Obtener los datos del formulario
+    const nombre = document.getElementById('nombre').value;
+    const descripcion = document.getElementById('descripcion').value;
+    const precio = parseFloat(document.getElementById('precio').value);
+    const imagen = document.getElementById('imagen').value;
+
+    // Crear un objeto de producto
+    const producto = {
+      nombre: nombre,
+      descripcion: descripcion,
+      precio: precio,
+      imagen: imagen
+    };
+
+    try {
+      // Subir el producto a Firestore
+      await addDoc(collection(db, "products"), producto);
+      alert('Producto agregado exitosamente!');
+      
+      // Limpiar el formulario
+      form.reset();
+    } catch (error) {
+      console.error('Error al agregar el producto:', error);
+      alert('Hubo un error al agregar el producto.');
+    }
+  });
+</script>

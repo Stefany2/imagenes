@@ -1,0 +1,45 @@
+---
+import { useState, useEffect } from 'astro';
+import { db } from '../firebaseConfig.js';
+import { collection, getDocs } from 'firebase/firestore';
+
+const [products, setProducts] = useState([]);
+
+// Función para obtener los productos de Firestore
+const fetchProducts = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "products"));
+    const productsList = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    setProducts(productsList);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
+
+// Cargar los productos cuando el componente se monta
+useEffect(() => {
+  fetchProducts();
+}, []);
+---
+
+<!-- Mostrar productos -->
+<section>
+  <h2>Productos Electrónicos</h2>
+  {products.length === 0 ? (
+    <p>No se han encontrado productos.</p>
+  ) : (
+    <div>
+      {products.map(product => (
+        <div key={product.id}>
+          <h3>{product.nombre}</h3>
+          <p>{product.descripcion}</p>
+          <p>Precio: ${product.precio}</p>
+          <img src={product.imagen} alt={product.nombre} width="200" />
+        </div>
+      ))}
+    </div>
+  )}
+</section>

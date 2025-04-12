@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agregar Producto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ecf0f1;
+      padding: 40px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #34495e;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #2980b9;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #21618c;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Agregar Nuevo Producto</h2>
+  <form id="formProducto">
+    <label for="nombre">Nombre del Producto</label>
+    <input type="text" id="nombre" name="nombre" required>
+
+    <label for="descripcion1">Descripción 1</label>
+    <input type="text" id="descripcion1" name="descripcion1" required>
+
+    <label for="descripcion2">Descripción 2</label>
+    <input type="text" id="descripcion2" name="descripcion2" required>
+
+    <label for="precio">Precio</label>
+    <input type="number" id="precio" name="precio" required>
+
+    <label for="imagen">URL de la Imagen</label>
+    <input type="text" id="imagen" name="imagen" required>
+
+    <button type="submit">Guardar Producto</button>
+  </form>
+
+  <script type="module">
+    // Firebase config e importaciones
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyDcvUpMZlIfGMO0rfOmPFYyNSQICV8oFkI",
+  authDomain: "shopping-b9b71.firebaseapp.com",
+  projectId: "shopping-b9b71",
+  storageBucket: "shopping-b9b71.firebasestorage.app",
+  messagingSenderId: "827308561516",
+  appId: "1:827308561516:web:007f52ff201d00a4b63449"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("formProducto");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const nuevoProducto = {
+        nombre: form.nombre.value,
+        descripcion1: form.descripcion1.value,
+        descripcion2: form.descripcion2.value,
+        precio: form.precio.value,
+        imagen: form.imagen.value,
+      };
+
+      try {
+        await addDoc(collection(db, "productos"), nuevoProducto);
+        alert("Producto agregado correctamente");
+        form.reset();
+      } catch (error) {
+        alert("Error al agregar producto: " + error);
+      }
+    });
+  </script>
+
+</body>
+</html>

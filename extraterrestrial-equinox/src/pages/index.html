@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productos</title>
+
+  <!-- Font Awesome -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+
+    header {
+      background-color: #2980b9;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header nav {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .product-item {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product-item:hover {
+      transform: translateY(-10px);
+    }
+
+    .product-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    h2 {
+      color: #2980b9;
+      font-size: 1.5em;
+      margin-top: 15px;
+    }
+
+    p {
+      color: #7f8c8d;
+      font-size: 1em;
+      margin: 10px 0;
+    }
+
+    .price {
+      font-size: 1.2em;
+      color: #e74c3c;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .add-to-cart-btn {
+      background-color: #2980b9;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .add-to-cart-btn:hover {
+      background-color: #1d5d8f;
+    }
+
+    .add-to-cart-btn i {
+      margin-right: 8px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nuevo Header -->
+  <header>
+    <h1>PRODUCTOS ELECTRÓNICOS</h1>
+    <nav>
+      <a href="#">Iniciar sesión</a>
+      <a href="#" title="Carrito"><i class="fas fa-shopping-cart fa-lg"></i></a>
+      <a href="formulario.html">Agregar producto</a>
+    </nav>
+  </header>
+
+  <div class="product-list" id="product-list"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="product-modal">
+    <div class="modal-content" id="modal-content">
+      <span class="modal-close" onclick="cerrarModal()">✖</span>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcvUpMZlIfGMO0rfOmPFYyNSQICV8oFkI",
+      authDomain: "shopping-b9b71.firebaseapp.com",
+      projectId: "shopping-b9b71",
+      storageBucket: "shopping-b9b71.firebasestorage.app",
+      messagingSenderId: "827308561516",
+      appId: "1:827308561516:web:007f52ff201d00a4b63449"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function getProducts() {
+      const snapshot = await db.collection("productos").get();
+      return snapshot.docs.map(doc => doc.data());
+    }
+
+    async function cargarProductos() {
+      const products = await getProducts();
+      const productList = document.getElementById("product-list");
+      productList.innerHTML = "";
+
+      products.forEach(product => {
+        const productItem = document.createElement("div");
+        productItem.classList.add("product-item");
+        productItem.innerHTML = `
+          <img src="${product.imagen}" alt="${product.nombre}" />
+          <h2>${product.nombre}</h2>
+          <p>${product.descripcion1}</p>
+          <p class="price">S/.${product.precio}</p>
+          <button class="add-to-cart-btn">
+            <i class="fas fa-shopping-cart"></i> Agregar al carrito
+          </button>
+        `;
+        productItem.addEventListener("click", () => mostrarProducto(product));
+        productList.appendChild(productItem);
+      });
+    }
+
+    function mostrarProducto(product) {
+      const modal = document.getElementById("product-modal");
+      const modalContent = document.getElementById("modal-content");
+      modalContent.innerHTML = `
+        <span class="modal-close" onclick="cerrarModal()">✖</span>
+        <img src="${product.imagen}" alt="${product.nombre}" />
+        <h2>${product.nombre}</h2>
+        <p>${product.descripcion1}</p>
+        <p>${product.descripcion2}</p>
+        <p><strong>Precio:</strong> S/. ${product.precio}</p>
+      `;
+      modal.style.display = "flex";
+    }
+
+    function cerrarModal() {
+      document.getElementById("product-modal").style.display = "none";
+    }
+
+    // Cargar productos al iniciar
+    cargarProductos();
+  </script>
+
+</body>
+</html>
