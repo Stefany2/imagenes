@@ -1,8 +1,15 @@
 ---
-import { getProductById } from '../../lib/firebase'; // o como sea tu función
+import { getProductById } from '../../lib/firebase';
 
-const { id } = Astro.params;
-const product = await getProductById(id);
+const { id } = Astro.params; // El id de la URL
+let product;
+
+try {
+  product = await getProductById(id); // Llamada a la función con el id
+} catch (error) {
+  console.error("Producto no encontrado:", error);
+  product = null;
+}
 ---
 
 <html lang="es">
@@ -10,44 +17,20 @@ const product = await getProductById(id);
     <meta charset="UTF-8" />
     <title>Detalles del Producto</title>
     <style>
-      body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f9f9f9;
-        padding: 20px;
-      }
-
-      .product-detail {
-        max-width: 600px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      }
-
-      h1 {
-        color: #2980b9;
-      }
-
-      img {
-        width: 100%;
-        border-radius: 10px;
-        margin-bottom: 15px;
-      }
-
-      p {
-        font-size: 1.1em;
-        margin-bottom: 10px;
-      }
+      /* Tus estilos aquí */
     </style>
   </head>
   <body>
-    <div class="product-detail">
-      <h1>{product.nombre}</h1>
-      {product.imagen && <img src={product.imagen} alt={product.nombre} />}
-      <p><strong>Descripción:</strong> {product.descripcion}</p>
-      <p><strong>Precio:</strong> S/ {product.precio.toFixed(2)}</p>
-      <a href="/">← Volver</a>
-    </div>
+    {product ? (
+      <div class="product-detail">
+        <h1>{product.nombre}</h1>
+        {product.imagen && <img src={product.imagen} alt={product.nombre} />}
+        <p><strong>Descripción:</strong> {product.descripcion}</p>
+        <p><strong>Precio:</strong> S/ {product.precio.toFixed(2)}</p>
+        <a href="/">← Volver</a>
+      </div>
+    ) : (
+      <p>Producto no encontrado</p> // Mensaje de error si no se encuentra el producto
+    )}
   </body>
 </html>

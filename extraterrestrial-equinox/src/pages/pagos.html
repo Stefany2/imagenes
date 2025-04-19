@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pagar - Carrito de Compras</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2980b9;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    .contenido {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .productos-carrito {
+      margin-bottom: 30px;
+    }
+
+    .producto {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .producto:last-child {
+      border-bottom: none;
+    }
+
+    .producto img {
+      width: 70px;
+      height: 70px;
+      border-radius: 8px;
+    }
+
+    .producto h3 {
+      margin: 0;
+      color: #2980b9;
+    }
+
+    .producto p {
+      margin: 4px 0;
+    }
+
+    .producto .precio {
+      font-weight: bold;
+      color: #e74c3c;
+    }
+
+    .metodos-pago {
+      margin-bottom: 30px;
+    }
+
+    .metodo-pago {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #ecf0f1;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .metodo-pago:hover {
+      background-color: #d5dbdb;
+    }
+
+    .metodo-pago i {
+      margin-right: 15px;
+      font-size: 2em;
+      color: #2980b9;
+    }
+
+    .metodo-pago p {
+      margin: 0;
+      font-size: 1.1em;
+    }
+
+    .bolita {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #bdc3c7;
+      margin-right: 15px;
+      transition: background-color 0.3s ease;
+    }
+
+    .metodo-pago.selected .bolita {
+      background-color: #2980b9;
+    }
+
+    .total-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .total-container p {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #2980b9;
+    }
+
+    .btn-finalizar {
+      background-color: #27ae60;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-finalizar:hover {
+      background-color: #1e8449;
+    }
+
+    .agregar-tarjeta {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #ecf0f1;
+      border-radius: 8px;
+    }
+
+    .agregar-tarjeta input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .agregar-tarjeta button {
+      padding: 12px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .agregar-tarjeta button:hover {
+      background-color: #2980b9;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FINALIZAR COMPRA</h1>
+    <button onclick="cerrarSesion()">Cerrar sesión</button>
+  </header>
+
+  <div class="contenido">
+    <div class="productos-carrito">
+      <h2>Productos en el carrito</h2>
+      <div id="productos-lista">
+        <!-- Productos del carrito se cargarán aquí -->
+      </div>
+    </div>
+
+    <div class="metodos-pago">
+      <h2>Métodos de Pago</h2>
+      
+      <div class="metodo-pago" onclick="seleccionarMetodoPago(this)">
+        <div class="bolita"></div>
+        <i class="fab fa-cc-visa"></i>
+        <p>Visa</p>
+      </div>
+
+      <div class="metodo-pago" onclick="seleccionarMetodoPago(this)">
+        <div class="bolita"></div>
+        <i class="fab fa-google-pay"></i>
+        <p>Google Pay</p>
+      </div>
+
+      <div class="metodo-pago" onclick="seleccionarMetodoPago(this)">
+        <div class="bolita"></div>
+        <i class="fas fa-mobile-alt"></i>
+        <p>PagoEfectivo</p>
+      </div>
+
+      <div class="agregar-tarjeta" id="agregar-tarjeta">
+        <h3>Agregar tarjeta de crédito/débito</h3>
+        <input type="text" placeholder="Número de tarjeta" />
+        <input type="text" placeholder="Nombre en la tarjeta" />
+        <input type="text" placeholder="Fecha de vencimiento (MM/AA)" />
+        <input type="text" placeholder="CVV" />
+        <button onclick="agregarTarjeta()">Agregar Tarjeta</button>
+      </div>
+    </div>
+
+    <div class="total-container">
+      <p id="total">Total: S/. 0.00</p>
+      <button class="btn-finalizar" onclick="finalizarCompra()">Finalizar Compra</button>
+    </div>
+  </div>
+
+  <script>
+    // Simulación de productos en el carrito
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const productosLista = document.getElementById("productos-lista");
+    const totalTexto = document.getElementById("total");
+
+    function cargarProductos() {
+      productosLista.innerHTML = '';
+      let total = 0;
+      carrito.forEach(producto => {
+        const div = document.createElement('div');
+        div.classList.add('producto');
+        div.innerHTML = `
+          <img src="${producto.imagen}" alt="${producto.nombre}">
+          <div>
+            <h3>${producto.nombre}</h3>
+            <p>${producto.descripcion}</p>
+            <p class="precio">S/. ${producto.precio}</p>
+          </div>
+        `;
+        productosLista.appendChild(div);
+        total += producto.precio * producto.cantidad;
+      });
+      totalTexto.innerText = `Total: S/. ${total.toFixed(2)}`;
+    }
+
+    function seleccionarMetodoPago(metodo) {
+      const metodosPago = document.querySelectorAll('.metodo-pago');
+      metodosPago.forEach(m => {
+        m.classList.remove('selected');
+      });
+      metodo.classList.add('selected');
+
+      if (metodo.querySelector('p').textContent === 'Visa') {
+        mostrarAgregarTarjeta();
+      } else {
+        document.getElementById('agregar-tarjeta').style.display = 'none';
+      }
+    }
+
+    function mostrarAgregarTarjeta() {
+      document.getElementById('agregar-tarjeta').style.display = 'block';
+    }
+
+    function agregarTarjeta() {
+      alert('Tarjeta agregada correctamente');
+      document.getElementById('agregar-tarjeta').style.display = 'none';
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem("carrito");
+      window.location.href = "index.html";
+    }
+
+    function finalizarCompra() {
+      alert('Compra finalizada. ¡Gracias por tu compra!');
+      localStorage.removeItem("carrito");
+      window.location.href = "index.html"; // Redirigir a la página de inicio
+    }
+
+    // Cargar los productos del carrito al iniciar la página
+    cargarProductos();
+  </script>
+</body>
+</html>

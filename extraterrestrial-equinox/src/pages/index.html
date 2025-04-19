@@ -149,6 +149,94 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
+
+    .whatsapp-btn {
+      display: inline-block;
+      background-color: #25D366;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 1em;
+      margin-top: 15px;
+      transition: background-color 0.3s;
+    }
+
+    .whatsapp-btn:hover {
+      background-color: #1ebe5d;
+    }
+
+    .whatsapp-btn i {
+      margin-right: 8px;
+    }
+
+    .quantity-input {
+      margin-top: 10px;
+      padding: 5px;
+      width: 50px;
+      text-align: center;
+      font-size: 1em;
+    }
+    .cart-link {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.8em;
+  font-weight: bold;
+  line-height: 1;
+}
+/* estilo del icono usuario*/
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px; /* Mueve hacia la izquierda */
+  }
+
+  .dropdown-toggle {
+    color: white;
+    text-decoration: none;
+    padding: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    border-radius: 5px;
+    overflow: hidden;
+    right: 0; /* Alinea el menú a la derecha del ícono */
+  }
+
+  .dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+  }
+
+  .dropdown-content a:hover {
+    background-color: #f1f1f1;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+
   </style>
 </head>
 <body>
@@ -157,9 +245,24 @@
   <header>
     <h1>PRODUCTOS ELECTRÓNICOS</h1>
     <nav>
-      <a href="#">Iniciar sesión</a>
-      <a href="#" title="Carrito"><i class="fas fa-shopping-cart fa-lg"></i></a>
-      <a href="formulario.html">Agregar producto</a>
+      
+      <a href="carrito.html" title="Carrito" class="cart-link">
+        <i class="fas fa-shopping-cart fa-lg"></i>
+        <span id="cart-count" class="cart-count">0</span>
+      </a>
+      
+      <div class="dropdown">
+        <span class="dropdown-toggle"><i class="fas fa-user-cog"></i></span>
+        <div class="dropdown-content">
+          <a href="adminLogin.html">Admin</a>
+          <a href="login.html">Usuario</a>
+          <a href="index.html" id="cerrar-sesion"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+
+
+        </div>
+      </div>
+      </div>
+      
     </nav>
   </header>
 
@@ -208,7 +311,7 @@
           <h2>${product.nombre}</h2>
           <p>${product.descripcion1}</p>
           <p class="price">S/.${product.precio}</p>
-          <button class="add-to-cart-btn">
+          <button class="add-to-cart-btn" onclick="agregarAlCarrito(event, ${JSON.stringify(product).replace(/"/g, '&quot;')})">
             <i class="fas fa-shopping-cart"></i> Agregar al carrito
           </button>
         `;
@@ -220,6 +323,9 @@
     function mostrarProducto(product) {
       const modal = document.getElementById("product-modal");
       const modalContent = document.getElementById("modal-content");
+      const mensaje = `Hola, estoy interesado en el producto "${product.nombre}". ¿Podrías brindarme más información?`;
+      const whatsappLink = `https://wa.me/931576209?text=${encodeURIComponent(mensaje)}`; // Reemplaza con tu número
+
       modalContent.innerHTML = `
         <span class="modal-close" onclick="cerrarModal()">✖</span>
         <img src="${product.imagen}" alt="${product.nombre}" />
@@ -227,6 +333,14 @@
         <p>${product.descripcion1}</p>
         <p>${product.descripcion2}</p>
         <p><strong>Precio:</strong> S/. ${product.precio}</p>
+        <label for="quantity">Cantidad:</label>
+        <input type="number" id="quantity" class="quantity-input" value="1" min="1" />
+        <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+          <i class="fas fa-shopping-cart"></i> Agregar al carrito
+        </button>
+        <a href="${whatsappLink}" target="_blank" class="whatsapp-btn">
+          <i class="fab fa-whatsapp"></i> Más información
+        </a>
       `;
       modal.style.display = "flex";
     }
@@ -234,6 +348,32 @@
     function cerrarModal() {
       document.getElementById("product-modal").style.display = "none";
     }
+
+   // Función para agregar al carrito con cantidad
+   function agregarAlCarritoConCantidad(producto) {
+  const cantidad = document.getElementById("quantity").value;
+  let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  producto.cantidad = cantidad;
+  carrito.push(producto);
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  alert(`Producto "${producto.nombre}" agregado al carrito con cantidad: ${cantidad}`);
+  cerrarModal();
+  actualizarContadorCarrito(); // 🔴 Aquí actualizamos el contador
+}
+
+cargarProductos().then(() => {
+  actualizarContadorCarrito(); // 🔴 También al cargar la página
+});
+
+
+// Función para actualizar el contador en el carrito
+function actualizarContadorCarrito() {
+  const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  const contadorCarrito = document.getElementById("cart-count");
+
+  // Establecer el número de productos en el carrito
+  contadorCarrito.textContent = carrito.length; // Mostrar el número total de productos
+}
 
     // Cargar productos al iniciar
     cargarProductos();

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro e Inicio de Sesión</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", sans-serif;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      background: linear-gradient(120deg, #5f2c82, #49a09d);
+      overflow: hidden;
+    }
+
+    canvas {
+      position: absolute;
+      z-index: -1;
+    }
+
+    .container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.15);
+      padding: 35px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+      width: 330px;
+    }
+
+    h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      background-color: #fff;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      background-color: #4a00e0;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #3700b3;
+    }
+
+    .message {
+      text-align: center;
+      color: yellow;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .switch-link {
+      text-align: center;
+      color: white;
+      margin-top: 15px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="web"></canvas>
+
+  <!-- Formulario de Inicio de Sesión -->
+  <div class="container" id="loginForm">
+    <h2>Iniciar Sesión Administradores</h2>
+    <input type="text" id="loginNombres" placeholder="Nombres">
+    <input type="password" id="loginPassword" placeholder="Contraseña">
+    <button id="loginBtn">Iniciar Sesión</button>
+    <div class="message" id="loginMessage"></div>
+    <div class="switch-link" id="toRegister">¿No tienes cuenta? Regístrate aquí</div>
+  </div>
+
+  <!-- Formulario de Registro -->
+  <div class="container hidden" id="registroForm">
+    <h2>Registrar Administrador</h2>
+    <input type="text" id="nombres" placeholder="Nombres completos">
+    <input type="text" id="cargo" placeholder="Cargo">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="registerBtn">Registrar</button>
+    <div class="message" id="message"></div>
+    <div class="switch-link" id="toLogin">¿Ya tienes cuenta? Inicia sesión aquí</div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcvUpMZlIfGMO0rfOmPFYyNSQICV8oFkI",
+      authDomain: "shopping-b9b71.firebaseapp.com",
+      projectId: "shopping-b9b71",
+      storageBucket: "shopping-b9b71.appspot.com",
+      messagingSenderId: "827308561516",
+      appId: "1:827308561516:web:007f52ff201d00a4b63449"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Mostrar formulario de registro al hacer clic en "Regístrate aquí"
+    document.getElementById('toRegister').addEventListener('click', () => {
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('registroForm').classList.remove('hidden');
+    });
+
+    // Mostrar formulario de inicio de sesión al hacer clic en "Inicia sesión aquí"
+    document.getElementById('toLogin').addEventListener('click', () => {
+      document.getElementById('registroForm').classList.add('hidden');
+      document.getElementById('loginForm').classList.remove('hidden');
+    });
+
+    // Registro
+    document.getElementById('registerBtn').addEventListener('click', () => {
+      const nombres = document.getElementById('nombres').value.trim();
+      const cargo = document.getElementById('cargo').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!nombres || !cargo || !password) {
+        document.getElementById('message').innerText = "❗ Completa todos los campos.";
+        return;
+      }
+
+      db.collection("administradores").add({
+        nombres: nombres,
+        cargo: cargo,
+        contraseña: password  // Asegúrate de que la base de datos tenga este campo 'contraseña'
+      }).then(() => {
+        document.getElementById('message').innerText = "✅ Registro exitoso.";
+        setTimeout(() => {
+          document.getElementById('registroForm').classList.add('hidden');
+          document.getElementById('loginForm').classList.remove('hidden');
+        }, 1500);
+      }).catch(error => {
+        document.getElementById('message').innerText = "❌ " + error.message;
+      });
+    });
+
+    // Inicio de sesión
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const loginNombres = document.getElementById('loginNombres').value.trim();
+      const loginPassword = document.getElementById('loginPassword').value;
+
+      if (!loginNombres || !loginPassword) {
+        document.getElementById('loginMessage').innerText = "❗ Ingresa nombre y contraseña.";
+        return;
+      }
+
+      db.collection("administradores")
+        .where("nombres", "==", loginNombres)
+        .where("contraseña", "==", loginPassword)  // Asegúrate de que la base de datos tenga este campo 'contraseña'
+        .get()
+        .then((querySnapshot) => {
+          if (!querySnapshot.empty) {
+            document.getElementById('loginMessage').innerText = "✅ Inicio de sesión exitoso.";
+            setTimeout(() => {
+              window.location.href = `registrando.html`;  // Redirigir al inicio de la aplicación o página principal
+            }, 1500);
+          } else {
+            document.getElementById('loginMessage').innerText = "❌ Datos incorrectos.";
+          }
+        })
+        .catch((error) => {
+          document.getElementById('loginMessage').innerText = "❌ Error al iniciar sesión.";
+        });
+    });
+  </script>
+
+  <!-- Fondo animado -->
+  <script>
+    const canvas = document.getElementById('web');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.radius = 2;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff88';
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+    }
+
+    function connectParticles() {
+      for (let a = 0; a < particles.length; a++) {
+        for (let b = a + 1; b < particles.length; b++) {
+          const dx = particles[a].x - particles[b].x;
+          const dy = particles[a].y - particles[b].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.strokeStyle = '#ffffff33';
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      connectParticles();
+      requestAnimationFrame(animate);
+    }
+
+    for (let i = 0; i < 100; i++) {
+      particles.push(new Particle());
+    }
+
+    animate();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>

@@ -1,34 +1,82 @@
----
-import { useEffect, useState } from 'astro';
-import { db } from '../firebaseConfig.js';
-import { collection, getDocs } from 'firebase/firestore';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carrito de Compras</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
 
-const [cart, setCart] = useState([]);
+    header {
+      background-color: #2980b9;
+      color: white;
+      padding: 10px 20px;
+    }
 
-useEffect(() => {
-  const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
-  setCart(savedCart);
-}, []);
+    h1 {
+      margin: 0;
+    }
 
-const getProductDetails = async (productId) => {
-  const docRef = await getDocs(collection(db, "products"));
-  return docRef.docs.find(doc => doc.id === productId);
-};
+    .carrito-container {
+      padding: 20px;
+    }
 
----
+    .producto {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
 
-<section>
-  <h2>Tu Carrito</h2>
-  {cart.length === 0 ? (
-    <p>No tienes productos en tu carrito.</p>
-  ) : (
-    <ul>
-      {cart.map(item => (
-        <li key={item.id}>
-          <p>Producto ID: {item.id}</p>
-          <p>Cantidad: {item.quantity}</p>
-        </li>
-      ))}
-    </ul>
-  )}
-</section>
+    .producto h2 {
+      margin: 0 0 10px 0;
+      color: #2980b9;
+    }
+
+    .producto p {
+      margin: 5px 0;
+    }
+
+    .precio {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mi Carrito</h1>
+  </header>
+
+  <div class="carrito-container" id="carrito-container">
+    <!-- Productos del carrito se cargarán aquí -->
+  </div>
+
+  <script>
+    const contenedor = document.getElementById("carrito-container");
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+    if (carrito.length === 0) {
+      contenedor.innerHTML = "<p>Tu carrito está vacío.</p>";
+    } else {
+      carrito.forEach(producto => {
+        const div = document.createElement("div");
+        div.classList.add("producto");
+        div.innerHTML = `
+          <h2>${producto.nombre}</h2>
+          <p>${producto.descripcion1}</p>
+          <p class="precio">S/. ${producto.precio}</p>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>

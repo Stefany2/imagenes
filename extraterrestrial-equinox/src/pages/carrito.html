@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carrito de Compras</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #e0f7fa, #f8f9fa);
+      color: #333;
+    }
+
+    header {
+      background-color: #2980b9;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header button {
+      background-color: #c0392b;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    header button:hover {
+      background-color: #a93226;
+    }
+
+    .carrito-container {
+      padding: 30px 20px 10px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .producto {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.2s ease;
+    }
+
+    .producto:hover {
+      transform: scale(1.01);
+    }
+
+    .producto h2 {
+      margin: 0 0 8px 0;
+      color: #2980b9;
+    }
+
+    .producto p {
+      margin: 4px 0;
+    }
+
+    .precio {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .cantidad {
+      display: flex;
+      align-items: center;
+    }
+
+    .cantidad button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .cantidad input {
+      width: 45px;
+      margin: 0 8px;
+      padding: 5px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .eliminar-btn {
+      background-color: transparent;
+      color: #e74c3c;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .eliminar-btn:hover {
+      color: #c0392b;
+    }
+
+    .total-pago {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      margin: 20px auto;
+      max-width: 900px;
+    }
+
+    .total-pago p {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #2980b9;
+      margin: 0;
+    }
+
+    .boton-pagar {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .boton-pagar:hover {
+      background-color: #1e8449;
+    }
+
+    @media (max-width: 600px) {
+      .producto {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .total-pago {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mi Carrito</h1>
+    <button onclick="cerrarSesion()">Cerrar Sesión</button>
+  </header>
+
+  <div class="carrito-container" id="carrito-container">
+    <!-- Productos del carrito se cargarán aquí -->
+  </div>
+
+  <div class="total-pago" id="total-container">
+    <button class="boton-pagar" onclick="irAPagar()">Pagar</button>
+    <p id="total">Total: S/. 0.00</p>
+  </div>
+
+  <script>
+    const contenedor = document.getElementById("carrito-container");
+    const totalTexto = document.getElementById("total");
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+    function actualizarTotal() {
+      const total = carrito.reduce((acc, producto) => acc + (producto.precio * producto.cantidad), 0);
+      totalTexto.innerText = `Total: S/. ${total.toFixed(2)}`;
+    }
+
+    function eliminarProducto(index) {
+      carrito.splice(index, 1);
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      cargarCarrito();
+    }
+
+    function actualizarCantidad(index, cantidad) {
+      cantidad = parseInt(cantidad);
+      if (cantidad < 1 || isNaN(cantidad)) cantidad = 1;
+      carrito[index].cantidad = cantidad;
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      cargarCarrito();
+    }
+
+    function cargarCarrito() {
+      contenedor.innerHTML = "";
+
+      if (carrito.length === 0) {
+        contenedor.innerHTML = "<p>Tu carrito está vacío.</p>";
+      } else {
+        carrito.forEach((producto, index) => {
+          const div = document.createElement("div");
+          div.classList.add("producto");
+          div.innerHTML = `
+            <div>
+              <h2>${producto.nombre}</h2>
+              <p>${producto.descripcion1}</p>
+              <p class="precio">S/. ${producto.precio}</p>
+            </div>
+            <div class="cantidad">
+              <button onclick="actualizarCantidad(${index}, ${producto.cantidad - 1})">-</button>
+              <input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)" />
+              <button onclick="actualizarCantidad(${index}, ${producto.cantidad + 1})">+</button>
+            </div>
+            <button class="eliminar-btn" onclick="eliminarProducto(${index})"><i class="fas fa-trash"></i></button>
+          `;
+          contenedor.appendChild(div);
+        });
+      }
+
+      actualizarTotal();
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem("carrito"); // Limpia el carrito al cerrar sesión
+      window.location.href = "index.html"; // Redirige a inicio
+    }
+
+    function irAPagar() {
+      window.location.href = "pagos.html"; // Redirige a página de pago
+    }
+
+    // Cargar carrito al iniciar
+    cargarCarrito();
+  </script>
+</body>
+</html>
