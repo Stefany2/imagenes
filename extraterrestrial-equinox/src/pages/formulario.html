@@ -3,120 +3,268 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agregar Producto</title>
+  <title>Gestión de Productos</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #ecf0f1;
-      padding: 40px;
+    :root {
+      --main-bg: #e0e5ec;
+      --light-shadow: #ffffff;
+      --dark-shadow: #a3b1c6;
+      --primary: #4b7bec;
+      --text-color: #2d3436;
     }
 
-    h2 {
-      text-align: center;
-      color: #2c3e50;
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--main-bg);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2, h3 {
+      color: var(--text-color);
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--main-bg);
+      box-shadow: 9px 9px 16px var(--dark-shadow),
+                  -9px -9px 16px var(--light-shadow);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
     }
 
     form {
-      max-width: 500px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
     }
 
     label {
-      display: block;
       margin-bottom: 5px;
-      color: #34495e;
-      font-weight: bold;
+      font-weight: 600;
+      color: var(--text-color);
     }
 
     input[type="text"],
     input[type="number"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 10px;
+      background: var(--main-bg);
+      box-shadow: inset 6px 6px 12px var(--dark-shadow),
+                  inset -6px -6px 12px var(--light-shadow);
+      font-size: 16px;
+      outline: none;
+      color: var(--text-color);
     }
 
     button {
-      width: 100%;
-      padding: 12px;
-      background-color: #2980b9;
+      padding: 14px;
+      background-color: var(--primary);
       color: white;
-      font-size: 16px;
+      font-weight: bold;
       border: none;
-      border-radius: 5px;
+      border-radius: 12px;
+      box-shadow: 0 8px 15px rgba(75, 123, 236, 0.3);
+      transition: all 0.3s ease;
       cursor: pointer;
     }
 
     button:hover {
-      background-color: #21618c;
+      background-color: #3867d6;
+      transform: translateY(-2px);
+    }
+
+    table {
+      margin-top: 40px;
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 1000px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f5f6fa;
+    }
+
+    img {
+      border-radius: 10px;
+      width: 50px;
+      height: auto;
+    }
+
+    .action-btn, .delete-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .action-btn {
+      background-color: #fdcb6e;
+    }
+
+    .delete-btn {
+      background-color: #d63031;
+    }
+
+    .action-btn:hover {
+      background-color: #e1b12c;
+    }
+
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+
+    @media (max-width: 768px) {
+      table, form {
+        font-size: 14px;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+
+      button {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h2>Agregar Nuevo Producto</h2>
-  <form id="formProducto">
-    <label for="nombre">Nombre del Producto</label>
-    <input type="text" id="nombre" name="nombre" required>
+  <h2>AGREGAR NUEVOS PRODUCTOS</h2>
 
-    <label for="descripcion1">Descripción 1</label>
-    <input type="text" id="descripcion1" name="descripcion1" required>
+  <div class="card">
+    <form id="formProducto">
+      <input type="hidden" id="idProducto">
+      <label for="nombre">Nombre del Producto</label>
+      <input type="text" id="nombre" name="nombre" required>
 
-    <label for="descripcion2">Descripción 2</label>
-    <input type="text" id="descripcion2" name="descripcion2" required>
+      <label for="descripcion1">Descripción 1</label>
+      <input type="text" id="descripcion1" name="descripcion1" required>
 
-    <label for="precio">Precio</label>
-    <input type="number" id="precio" name="precio" required>
+      <label for="descripcion2">Descripción 2</label>
+      <input type="text" id="descripcion2" name="descripcion2" required>
 
-    <label for="imagen">URL de la Imagen</label>
-    <input type="text" id="imagen" name="imagen" required>
+      <label for="precio">Precio</label>
+      <input type="number" id="precio" name="precio" required>
 
-    <button type="submit">Guardar Producto</button>
-  </form>
+      <label for="imagen">URL de la Imagen</label>
+      <input type="text" id="imagen" name="imagen" required>
+
+      <button type="submit">Guardar Producto</button>
+    </form>
+  </div>
+
+  <h3>Lista de Productos</h3>
+  <table id="tablaProductos">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción 1</th>
+        <th>Descripción 2</th>
+        <th>Precio</th>
+        <th>Imagen</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script type="module">
-    // Firebase config e importaciones
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyDcvUpMZlIfGMO0rfOmPFYyNSQICV8oFkI",
-  authDomain: "shopping-b9b71.firebaseapp.com",
-  projectId: "shopping-b9b71",
-  storageBucket: "shopping-b9b71.firebasestorage.app",
-  messagingSenderId: "827308561516",
-  appId: "1:827308561516:web:007f52ff201d00a4b63449"
-};
+      apiKey: "AIzaSyDcvUpMZlIfGMO0rfOmPFYyNSQICV8oFkI",
+      authDomain: "shopping-b9b71.firebaseapp.com",
+      projectId: "shopping-b9b71",
+      storageBucket: "shopping-b9b71.appspot.com",
+      messagingSenderId: "827308561516",
+      appId: "1:827308561516:web:007f52ff201d00a4b63449"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     const form = document.getElementById("formProducto");
+    const tabla = document.querySelector("#tablaProductos tbody");
+
+    async function cargarProductos() {
+      tabla.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "productos"));
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${data.nombre}</td>
+          <td>${data.descripcion1}</td>
+          <td>${data.descripcion2}</td>
+          <td>$${data.precio}</td>
+          <td><img src="${data.imagen}" alt="img"></td>
+          <td>
+            <button class="action-btn" onclick="editarProducto('${docSnap.id}', '${data.nombre}', '${data.descripcion1}', '${data.descripcion2}', ${data.precio}, '${data.imagen}')">Editar</button>
+            <button class="delete-btn" onclick="eliminarProducto('${docSnap.id}')">Eliminar</button>
+          </td>
+        `;
+        tabla.appendChild(row);
+      });
+    }
+
+    window.editarProducto = (id, nombre, descripcion1, descripcion2, precio, imagen) => {
+      form.idProducto.value = id;
+      form.nombre.value = nombre;
+      form.descripcion1.value = descripcion1;
+      form.descripcion2.value = descripcion2;
+      form.precio.value = precio;
+      form.imagen.value = imagen;
+    };
+
+    window.eliminarProducto = async (id) => {
+      await deleteDoc(doc(db, "productos", id));
+      cargarProductos();
+    };
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      const nuevoProducto = {
+      const producto = {
         nombre: form.nombre.value,
         descripcion1: form.descripcion1.value,
         descripcion2: form.descripcion2.value,
-        precio: form.precio.value,
+        precio: parseFloat(form.precio.value),
         imagen: form.imagen.value,
       };
 
-      try {
-        await addDoc(collection(db, "productos"), nuevoProducto);
-        alert("Producto agregado correctamente");
-        form.reset();
-      } catch (error) {
-        alert("Error al agregar producto: " + error);
+      if (form.idProducto.value) {
+        await updateDoc(doc(db, "productos", form.idProducto.value), producto);
+        form.idProducto.value = "";
+      } else {
+        await addDoc(collection(db, "productos"), producto);
       }
+
+      form.reset();
+      cargarProductos();
     });
+
+    cargarProductos();
   </script>
 
 </body>

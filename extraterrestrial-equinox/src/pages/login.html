@@ -161,7 +161,7 @@
               const nombre = doc.data().nombres || "Usuario";
               document.getElementById('message').innerText = "✅ Bienvenido, " + nombre;
               setTimeout(() => {
-                window.location.href = `index.html?nombre=${encodeURIComponent(nombre)}`;
+                window.location.href = `inicio.html?nombre=${encodeURIComponent(nombre)}`;
               }, 1500);
             } else {
               document.getElementById('message').innerText = "⚠️ Usuario sin nombre registrado.";
